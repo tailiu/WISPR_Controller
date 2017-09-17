@@ -6,7 +6,8 @@ from mininet.net import Mininet
 from mininet.link import TCLink
 from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
-from mininet.node import OVSController
+from mininet.node import OVSController, RemoteController    
+from mininet.cli import CLI
 
 def from_autonetkit(topology):
     """Convert an AutoNetKit graph into an FNSS Topology object.
@@ -50,20 +51,23 @@ def main():
 
     mn_topo = fnss.to_mininet(fnss_topo, switches=switches, hosts=hosts, relabel_nodes=True)
 
-    net = Mininet(topo=mn_topo, link=TCLink, controller=OVSController)
+    net = Mininet(topo=mn_topo, link=TCLink, controller=None)
+    c0=net.addController(name='c0', controller=RemoteController, ip='127.0.0.1', protocol='tcp', port=6653)
+
     net.start()
 
     # Dump host connections
     dumpNodeConnections(net.hosts)
 
     # Test network connectivity
-    net.pingAll()
+    #net.pingAll()
 
     # Test bandwidth between nodes
-    h1, h8 = net.get('h1', 'h8')
-    net.iperf((h1, h8))
+    #h1, h8 = net.get('h1', 'h8')
+    #net.iperf((h1, h8))
 
     # Stop Mininet
+    CLI(net)
     net.stop()
 
 
